@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proyectos — SDC v3.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css?v=3.0.0" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menú principal">
+    <div class="sidebar-logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-title">SDC Sistema</div>
+      <div class="logo-sub">Diseño Integrado de Circuitos</div>
+    </div>
+    <p class="section-title">Principal</p>
+    <a href="dashboard.html"   class="nav-item" data-page="dashboard.html"><span class="material-icons-round nav-icon">dashboard</span> Panel</a>
+    <a href="proyectos.html"   class="nav-item" data-page="proyectos.html"><span class="material-icons-round nav-icon">folder_open</span> Proyectos</a>
+    <a href="disenios.html"    class="nav-item" data-page="disenios.html"><span class="material-icons-round nav-icon">design_services</span> Diseños</a>
+    <a href="componentes.html" class="nav-item" data-page="componentes.html"><span class="material-icons-round nav-icon">memory</span> Componentes</a>
+    <p class="section-title">Validación</p>
+    <a href="simulaciones.html" class="nav-item" data-page="simulaciones.html"><span class="material-icons-round nav-icon">science</span> Simulaciones</a>
+    <a href="proveedores.html"  class="nav-item" data-page="proveedores.html"><span class="material-icons-round nav-icon">local_shipping</span> Proveedores</a>
+    <p class="section-title">Cuenta</p>
+    <a href="perfil.html" class="nav-item" data-page="perfil.html"><span class="material-icons-round nav-icon">person</span> Mi Perfil</a>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebarUserInit">MO</div>
+        <div>
+          <div class="user-name"  id="sidebarUserName">Michael Olivares</div>
+          <div class="user-role"  id="sidebarUserRole">Administrador</div>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="logout()" style="width:100%;margin-top:10px;color:var(--sidebar-txt);border-color:rgba(255,255,255,.2);">
+        <span class="material-icons-round" style="font-size:16px;">logout</span> Cerrar sesión
+      </button>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ── TOPBAR ─────────────────────────────────────── -->
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú">
+        <span class="material-icons-round">menu</span>
+      </button>
+      <nav class="breadcrumb" aria-label="Ubicación">
+        <a href="dashboard.html">Inicio</a> &rsaquo; <span>Proyectos</span>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary btn-sm" id="btnNuevoProyecto">
+        <span class="material-icons-round" style="font-size:16px;">add</span> Nuevo Proyecto
+      </button>
+    </div>
+  </header>
+
+  <!-- ── CONTENIDO PRINCIPAL ────────────────────────── -->
+  <main class="main-content" role="main">
+
+    <!-- Filtros -->
+    <div class="filter-bar" role="toolbar" aria-label="Filtros de proyectos">
+      <div class="search-box" style="flex:1;max-width:320px;">
+        <span class="material-icons-round search-icon" aria-hidden="true">search</span>
+        <input type="text" id="searchProyecto" class="form-control" placeholder="Buscar proyecto…" aria-label="Buscar proyecto" />
+      </div>
+      <button class="filter-chip active" data-filter="todos">Todos</button>
+      <button class="filter-chip" data-filter="activo">Activos</button>
+      <button class="filter-chip" data-filter="finalizado">Finalizados</button>
+      <button class="filter-chip" data-filter="archivado">Archivados</button>
+    </div>
+
+    <!-- Grid de proyectos -->
+    <div class="projects-grid" id="projectsGrid" aria-live="polite" aria-label="Lista de proyectos">
+      <!-- Renderizado con JS -->
+    </div>
+
+  </main>
+</div>
+
+<!-- ── PANEL DE DETALLE ──────────────────────────────── -->
+<aside class="detail-panel" id="detailPanel" role="complementary" aria-label="Detalle del proyecto">
+  <div class="detail-panel-header">
+    <h3 style="font-size:.95rem;" id="detailPanelTitle">Detalle del Proyecto</h3>
+    <button class="btn-icon" onclick="closeDetailPanel()" aria-label="Cerrar panel de detalle">
+      <span class="material-icons-round">close</span>
+    </button>
+  </div>
+  <div class="detail-panel-body" id="detailPanelBody">
+    <!-- Relleno con JS -->
+  </div>
+</aside>
+
+<!-- ── MODAL NUEVO / EDITAR PROYECTO ─────────────────── -->
+<div class="modal-overlay" id="modalProyecto" role="dialog" aria-modal="true" aria-labelledby="modalProyectoTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalProyectoTitle">Crear Nuevo Proyecto</div>
+        <div class="modal-sub">Complete los datos del proyecto electrónico</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalProyecto')" aria-label="Cerrar modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="formProyecto" novalidate>
+        <!-- Nombre -->
+        <div class="form-group">
+          <label class="form-label" for="pNombre">Nombre del Proyecto <span class="required">*</span></label>
+          <input type="text" id="pNombre" class="form-control" placeholder="Ej: Tarjeta de Control Motor BLDC" maxlength="200" required aria-describedby="pNombreErr" />
+          <span class="form-error" id="pNombreErr">El nombre del proyecto es requerido.</span>
+        </div>
+        <!-- Tipo y Estado -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="pTipo">Tipo de Circuito <span class="required">*</span></label>
+            <select id="pTipo" class="form-control" required aria-describedby="pTipoErr">
+              <option value="">— Seleccionar tipo —</option>
+              <option value="mixto">Mixto</option>
+              <option value="microcontrolador">Microcontrolador</option>
+              <option value="asic">ASIC</option>
+              <option value="fpga">FPGA</option>
+              <option value="analogico">Analógico</option>
+            </select>
+            <span class="form-error" id="pTipoErr">Seleccione el tipo de circuito.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pEstado">Estado Inicial</label>
+            <select id="pEstado" class="form-control">
+              <option value="activo">Activo</option>
+              <option value="finalizado">Finalizado</option>
+              <option value="archivado">Archivado</option>
+            </select>
+          </div>
+        </div>
+        <!-- Versión -->
+        <div class="form-group">
+          <label class="form-label" for="pVersion">Versión Actual</label>
+          <input type="text" id="pVersion" class="form-control" placeholder="Ej: 1.0.0" maxlength="20" />
+        </div>
+        <!-- Descripción -->
+        <div class="form-group">
+          <label class="form-label" for="pDesc">Descripción Técnica</label>
+          <textarea id="pDesc" class="form-control" rows="3" placeholder="Describa el objetivo y alcance del proyecto…" maxlength="1000"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalProyecto')">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarProyecto">
+        <span class="material-icons-round" style="font-size:16px;">save</span> Crear Proyecto
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<script src="../js/app.js?v=3.0.0"></script>
+<script>
+  'use strict';
+  /* ── Lógica específica de Proyectos ── */
+
+  /** @type {Object|null} Proyecto seleccionado actualmente en el panel de detalle */
+  let selectedProject = null;
+
+  /** @type {string} Filtro activo por estado */
+  let activeFilter = 'todos';
+
+  /** @type {string} Texto de búsqueda activo */
+  let searchQuery = '';
+
+  /**
+   * Devuelve la lista de proyectos filtrada por estado y búsqueda.
+   * @returns {Array} Lista filtrada de proyectos.
+   */
+  function getFilteredProyectos() {
+    return repoProyectos.filter(p => {
+      const matchesFilter = activeFilter === 'todos' || p.estado === activeFilter;
+      const matchesSearch = !searchQuery ||
+        p.nombre.toLowerCase().includes(searchQuery) ||
+        p.descripcion.toLowerCase().includes(searchQuery) ||
+        p.tipo_circuito.toLowerCase().includes(searchQuery);
+      return matchesFilter && matchesSearch;
+    });
+  }
+
+  /**
+   * Renderiza el grid completo de proyectos.
+   * @param {Array} proyectos - Proyectos a mostrar.
+   */
+  function renderProyectosGrid(proyectos) {
+    const grid = document.getElementById('projectsGrid');
+    if (!grid) return;
+
+    if (proyectos.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="empty-icon">📁</div>
+          <p>No se encontraron proyectos con los filtros aplicados.</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = proyectos.map(p => `
+      <div class="project-card animate-in" data-id="${p.id}"
+           role="button" tabindex="0" aria-label="Ver detalle de ${p.nombre}"
+           onclick="handleSelectProyecto(${p.id})"
+           onkeydown="if(event.key==='Enter')handleSelectProyecto(${p.id})">
+        <div class="project-card-top">
+          <span style="font-size:1.8rem;" aria-hidden="true">${getTipoIcon(p.tipo_circuito)}</span>
+          <span class="badge ${getBadgeClass(p.estado)}">${capitalizeFirst(p.estado)}</span>
+        </div>
+        <div class="project-card-name">${p.nombre}</div>
+        <div class="project-card-desc">${p.descripcion.slice(0,100)}…</div>
+        <div class="project-card-meta">
+          <span class="chip">${p.tipo_circuito}</span>
+          <span class="chip text-mono">${p.version_actual}</span>
+        </div>
+        <div style="display:flex;gap:16px;margin:10px 0;font-size:.78rem;color:var(--text-muted);">
+          <span>📐 ${p.disenios} diseños</span>
+          <span>🔬 ${p.simulaciones} sims</span>
+          <span>🧪 ${p.pruebas} pruebas</span>
+        </div>
+        <div class="project-card-footer">
+          <span>👤 ${p.creador}</span>
+          <span>📅 ${formatDate(p.fecha_creacion)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /**
+   * Abre el panel lateral con el detalle del proyecto seleccionado.
+   * @param {number} id - ID del proyecto.
+   */
+  function handleSelectProyecto(id) {
+    const proyecto = repoProyectos.findById(id);
+    if (!proyecto) return;
+    selectedProject = proyecto;
+
+    document.getElementById('detailPanelTitle').textContent = proyecto.nombre;
+
+    // Diseños de este proyecto
+    const disenios = repoDisenios.filter(d => d.id_proyecto === id);
+
+    document.getElementById('detailPanelBody').innerHTML = `
+      <div class="detail-section">
+        <div class="detail-section-title">Información General</div>
+        <div class="detail-row"><span class="detail-key">Estado</span>
+          <span class="badge ${getBadgeClass(proyecto.estado)}">${capitalizeFirst(proyecto.estado)}</span></div>
+        <div class="detail-row"><span class="detail-key">Tipo</span>
+          <span class="detail-val">${getTipoIcon(proyecto.tipo_circuito)} ${proyecto.tipo_circuito}</span></div>
+        <div class="detail-row"><span class="detail-key">Versión</span>
+          <span class="detail-val text-mono">${proyecto.version_actual}</span></div>
+        <div class="detail-row"><span class="detail-key">Creador</span>
+          <span class="detail-val">${proyecto.creador}</span></div>
+        <div class="detail-row"><span class="detail-key">Creación</span>
+          <span class="detail-val">${formatDate(proyecto.fecha_creacion)}</span></div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Descripción</div>
+        <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.6;">${proyecto.descripcion}</p>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Estadísticas</div>
+        <div class="stat-row">
+          <div class="stat-item"><div class="stat-val">${proyecto.disenios}</div><div class="stat-lbl">Diseños</div></div>
+          <div class="stat-item"><div class="stat-val">${proyecto.simulaciones}</div><div class="stat-lbl">Sims</div></div>
+          <div class="stat-item"><div class="stat-val">${proyecto.pruebas}</div><div class="stat-lbl">Pruebas</div></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Estándares Aplicados</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${proyecto.estandares.map(e => `<span class="chip">${e}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Diseños (${disenios.length})</div>
+        <div class="version-list">
+          ${disenios.map(d => `
+            <div class="version-item">
+              <div>
+                <div style="font-weight:600;font-size:.8rem;">${getTipoIcon(d.tipo)} ${d.nombre}</div>
+                <div class="text-muted">${d.formato}</div>
+              </div>
+              <span class="badge ${getBadgeClass(d.estado)}">${capitalizeFirst(d.estado)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn btn-primary btn-sm" onclick="handleEditarProyecto(${proyecto.id})" style="flex:1;">
+          <span class="material-icons-round" style="font-size:15px;">edit</span> Editar
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="handleEliminarProyecto(${proyecto.id})" style="flex:1;">
+          <span class="material-icons-round" style="font-size:15px;">delete</span> Eliminar
+        </button>
+      </div>
+    `;
+
+    openDetailPanel();
+  }
+
+  /**
+   * Abre el modal pre-rellenado para editar un proyecto.
+   * @param {number} id - ID del proyecto a editar.
+   */
+  function handleEditarProyecto(id) {
+    const p = repoProyectos.findById(id);
+    if (!p) return;
+
+    document.getElementById('modalProyectoTitle').textContent = 'Editar Proyecto';
+    document.getElementById('pNombre').value  = p.nombre;
+    document.getElementById('pTipo').value    = p.tipo_circuito;
+    document.getElementById('pEstado').value  = p.estado;
+    document.getElementById('pVersion').value = p.version_actual;
+    document.getElementById('pDesc').value    = p.descripcion;
+
+    // Cambiar acción del botón guardar a editar
+    const btn = document.getElementById('btnGuardarProyecto');
+    btn.dataset.editId = id;
+    btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">save</span> Guardar Cambios';
+
+    openModal('modalProyecto');
+  }
+
+  /**
+   * Simula la eliminación de un proyecto con confirmación.
+   * @param {number} id - ID del proyecto a eliminar.
+   */
+  function handleEliminarProyecto(id) {
+    const p = repoProyectos.findById(id);
+    if (!p) return;
+    if (!confirm(`¿Desea eliminar el proyecto "${p.nombre}"?\nEsta acción eliminará también todos sus diseños.`)) return;
+
+    const ok = repoProyectos.remove(id);
+    if (ok) {
+      closeDetailPanel();
+      renderProyectosGrid(getFilteredProyectos());
+      showToast(`Proyecto "${p.nombre}" eliminado.`, 'warning', 3000);
+    }
+  }
+
+  /** Resetea el formulario del modal a su estado inicial. */
+  function resetFormProyecto() {
+    document.getElementById('formProyecto').reset();
+    document.getElementById('modalProyectoTitle').textContent = 'Crear Nuevo Proyecto';
+    const btn = document.getElementById('btnGuardarProyecto');
+    delete btn.dataset.editId;
+    btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">save</span> Crear Proyecto';
+    ['pNombre','pTipo'].forEach(id => setFieldError(id, id + 'Err', false));
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = requireAuth();
+    if (!user) return;
+
+    renderSidebarUser(user);
+    initCommon();
+    renderProyectosGrid(getFilteredProyectos());
+
+    // Búsqueda en tiempo real
+    document.getElementById('searchProyecto').addEventListener('input', e => {
+      searchQuery = e.target.value.toLowerCase().trim();
+      renderProyectosGrid(getFilteredProyectos());
+    });
+
+    // Filtros por chip
+    document.querySelectorAll('.filter-chip[data-filter]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip[data-filter]').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeFilter = chip.dataset.filter;
+        renderProyectosGrid(getFilteredProyectos());
+      });
+    });
+
+    // Abrir modal nuevo proyecto
+    document.getElementById('btnNuevoProyecto').addEventListener('click', () => {
+      resetFormProyecto();
+      openModal('modalProyecto');
+    });
+
+    // Guardar proyecto (crear o editar)
+    document.getElementById('btnGuardarProyecto').addEventListener('click', () => {
+      const nombre  = document.getElementById('pNombre').value.trim();
+      const tipo    = document.getElementById('pTipo').value;
+      const estado  = document.getElementById('pEstado').value;
+      const version = document.getElementById('pVersion').value.trim() || '1.0.0';
+      const desc    = document.getElementById('pDesc').value.trim();
+      let hasError  = false;
+
+      if (!validateRequired(nombre)) { setFieldError('pNombre','pNombreErr',true); hasError = true; }
+      else setFieldError('pNombre','pNombreErr',false);
+
+      if (!validateRequired(tipo))   { setFieldError('pTipo','pTipoErr',true); hasError = true; }
+      else setFieldError('pTipo','pTipoErr',false);
+
+      if (hasError) return;
+
+      const btn    = document.getElementById('btnGuardarProyecto');
+      const editId = btn.dataset.editId ? parseInt(btn.dataset.editId) : null;
+
+      if (editId) {
+        // Editar existente
+        repoProyectos.update(editId, {
+          nombre, tipo_circuito: tipo, estado, version_actual: version, descripcion: desc || 'Sin descripción.'
+        });
+        showToast(`Proyecto "${nombre}" actualizado ✓`, 'success');
+      } else {
+        // Crear nuevo
+        repoProyectos.add({
+          nombre, descripcion: desc || 'Sin descripción.',
+          tipo_circuito: tipo, estado, version_actual: version,
+          creador: user.nombre, id_usuario_creador: user.id,
+          fecha_creacion: new Date().toISOString().slice(0,10),
+          disenios: 0, simulaciones: 0, pruebas: 0, estandares: []
+        });
+        showToast(`Proyecto "${nombre}" creado exitosamente ✓`, 'success');
+      }
+
+      closeModal('modalProyecto');
+      renderProyectosGrid(getFilteredProyectos());
+    });
+  });
+</script>
+</body>
+</html>

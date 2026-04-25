@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Perfil — SDC v3.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css?v=3.0.0" />
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menú principal">
+    <div class="sidebar-logo"><div class="logo-icon">⚡</div><div class="logo-title">SDC Sistema</div><div class="logo-sub">Diseño Integrado de Circuitos</div></div>
+    <p class="section-title">Principal</p>
+    <a href="dashboard.html"   class="nav-item" data-page="dashboard.html"><span class="material-icons-round nav-icon">dashboard</span> Panel</a>
+    <a href="proyectos.html"   class="nav-item" data-page="proyectos.html"><span class="material-icons-round nav-icon">folder_open</span> Proyectos</a>
+    <a href="disenios.html"    class="nav-item" data-page="disenios.html"><span class="material-icons-round nav-icon">design_services</span> Diseños</a>
+    <a href="componentes.html" class="nav-item" data-page="componentes.html"><span class="material-icons-round nav-icon">memory</span> Componentes</a>
+    <p class="section-title">Validación</p>
+    <a href="simulaciones.html" class="nav-item" data-page="simulaciones.html"><span class="material-icons-round nav-icon">science</span> Simulaciones</a>
+    <a href="proveedores.html"  class="nav-item" data-page="proveedores.html"><span class="material-icons-round nav-icon">local_shipping</span> Proveedores</a>
+    <p class="section-title">Cuenta</p>
+    <a href="perfil.html" class="nav-item" data-page="perfil.html"><span class="material-icons-round nav-icon">person</span> Mi Perfil</a>
+    <div class="sidebar-footer">
+      <div class="user-info"><div class="user-avatar" id="sidebarUserInit">MO</div>
+        <div><div class="user-name" id="sidebarUserName">Michael Olivares</div><div class="user-role" id="sidebarUserRole">Administrador</div></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="logout()" style="width:100%;margin-top:10px;color:var(--sidebar-txt);border-color:rgba(255,255,255,.2);"><span class="material-icons-round" style="font-size:16px;">logout</span> Cerrar sesión</button>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú"><span class="material-icons-round">menu</span></button>
+      <nav class="breadcrumb" aria-label="Ubicación"><a href="dashboard.html">Inicio</a> &rsaquo; <span>Mi Perfil</span></nav>
+    </div>
+  </header>
+
+  <main class="main-content" role="main">
+
+    <!-- Cabecera de perfil -->
+    <div class="profile-header">
+      <div class="profile-avatar-lg" id="profileAvatar">MO</div>
+      <div class="profile-info">
+        <h2 id="profileName">Michael Olivares</h2>
+        <p id="profileEmail">michael.olivares@sena.edu.co</p>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <span class="badge" id="profileRolBadge" style="background:rgba(255,255,255,.2);color:#fff;">Administrador</span>
+          <span class="badge" style="background:rgba(255,255,255,.15);color:#fff;">✓ Cuenta activa</span>
+          <span class="badge" id="profileNivelBadge" style="background:rgba(255,255,255,.15);color:#fff;">Acceso: Total</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+
+      <!-- Datos personales -->
+      <div class="profile-card">
+        <h4>👤 Información de la Cuenta</h4>
+        <div class="detail-row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+          <span class="detail-key">Nombre completo</span>
+          <span class="detail-val" id="infoNombre">—</span>
+        </div>
+        <div class="detail-row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+          <span class="detail-key">Correo electrónico</span>
+          <span class="detail-val text-mono" id="infoEmail">—</span>
+        </div>
+        <div class="detail-row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+          <span class="detail-key">Rol en el sistema</span>
+          <span class="detail-val" id="infoRol">—</span>
+        </div>
+        <div class="detail-row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+          <span class="detail-key">Nivel de acceso</span>
+          <span class="detail-val" id="infoNivel">—</span>
+        </div>
+        <div class="detail-row" style="padding:8px 0;">
+          <span class="detail-key">Estado</span>
+          <span class="badge badge-success" id="infoEstado">Activo</span>
+        </div>
+      </div>
+
+      <!-- Actividad en el sistema -->
+      <div class="profile-card">
+        <h4>📊 Mi Actividad en el Sistema</h4>
+        <div class="metrics-grid" style="grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;">
+          <div class="metric-card" style="--accent-color:var(--primary-600);padding:14px;">
+            <div class="metric-label">Mis Proyectos</div>
+            <div class="metric-value" id="actProyectos" style="font-size:1.8rem;">0</div>
+          </div>
+          <div class="metric-card" style="--accent-color:var(--success);padding:14px;">
+            <div class="metric-label">Mis Diseños</div>
+            <div class="metric-value" id="actDisenios" style="font-size:1.8rem;">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cambiar contraseña -->
+      <div class="profile-card">
+        <h4>🔒 Cambiar Contraseña</h4>
+        <form id="formCambiarPwd" novalidate>
+          <div class="form-group" style="margin-top:8px;">
+            <label class="form-label" for="pwdActual">Contraseña actual <span class="required">*</span></label>
+            <input type="password" id="pwdActual" class="form-control" placeholder="••••••••" aria-describedby="pwdActualErr" />
+            <span class="form-error" id="pwdActualErr">Ingrese su contraseña actual.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pwdNueva">Nueva contraseña <span class="required">*</span></label>
+            <input type="password" id="pwdNueva" class="form-control" placeholder="Mín. 8 caracteres" aria-describedby="pwdNuevaErr" />
+            <span class="form-error" id="pwdNuevaErr">La nueva contraseña debe tener al menos 8 caracteres.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pwdConfirm">Confirmar contraseña <span class="required">*</span></label>
+            <input type="password" id="pwdConfirm" class="form-control" placeholder="Repetir contraseña" aria-describedby="pwdConfirmErr" />
+            <span class="form-error" id="pwdConfirmErr">Las contraseñas no coinciden.</span>
+          </div>
+          <button type="button" class="btn btn-primary" id="btnCambiarPwd" style="width:100%;">
+            <span class="material-icons-round" style="font-size:16px;">lock_reset</span> Actualizar Contraseña
+          </button>
+        </form>
+      </div>
+
+      <!-- Configuración del sistema -->
+      <div class="profile-card">
+        <h4>⚙️ Configuración del Sistema</h4>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--surface-alt);border-radius:var(--r-md);">
+            <div>
+              <div style="font-weight:600;font-size:.84rem;">Notificaciones por correo</div>
+              <div class="text-muted">Recibir alertas de cambios en diseños</div>
+            </div>
+            <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer;" aria-label="Activar notificaciones por correo">
+              <input type="checkbox" id="toggleNotif" checked style="opacity:0;width:0;height:0;" />
+              <span id="toggleNotifTrack" style="position:absolute;inset:0;background:var(--primary-600);border-radius:var(--r-full);transition:background var(--t-fast);">
+                <span style="position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform var(--t-fast);" id="toggleNotifThumb"></span>
+              </span>
+            </label>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--surface-alt);border-radius:var(--r-md);">
+            <div>
+              <div style="font-weight:600;font-size:.84rem;">Idioma del sistema</div>
+              <div class="text-muted">Español (Colombia)</div>
+            </div>
+            <span class="chip">🇨🇴 ES</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--surface-alt);border-radius:var(--r-md);">
+            <div>
+              <div style="font-weight:600;font-size:.84rem;">Versión del sistema</div>
+              <div class="text-muted">GA7-220501096-AA3-EV01</div>
+            </div>
+            <span class="chip">v3.0.0</span>
+          </div>
+
+        </div>
+
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+          <button class="btn btn-danger" style="width:100%;" onclick="confirmLogout()">
+            <span class="material-icons-round" style="font-size:16px;">logout</span>
+            Cerrar sesión del sistema
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+<script src="../js/app.js?v=3.0.0"></script>
+<script>
+  'use strict';
+  /* ── Lógica específica de la pantalla Perfil ── */
+
+  /**
+   * Rellena todos los elementos del DOM con los datos del usuario de sesión.
+   * @param {Object} user - Usuario autenticado.
+   */
+  function renderPerfil(user) {
+    // Cabecera
+    document.getElementById('profileAvatar').textContent = user.initials;
+    document.getElementById('profileName').textContent   = user.nombre;
+    document.getElementById('profileEmail').textContent  = user.email;
+    document.getElementById('profileRolBadge').textContent  = capitalizeFirst(user.rol);
+    document.getElementById('profileNivelBadge').textContent = `Acceso: ${capitalizeFirst(user.nivel_acceso)}`;
+
+    // Datos
+    document.getElementById('infoNombre').textContent = user.nombre;
+    document.getElementById('infoEmail').textContent  = user.email;
+    document.getElementById('infoRol').textContent    = capitalizeFirst(user.rol);
+    document.getElementById('infoNivel').textContent  = capitalizeFirst(user.nivel_acceso);
+    document.getElementById('infoEstado').textContent = capitalizeFirst(user.estado);
+
+    // Actividad
+    const misProyectos = repoProyectos.filter(p => p.id_usuario_creador === user.id);
+    const misDisenios  = repoDisenios.filter(d =>  d.creador === user.nombre);
+    animateCounter(document.getElementById('actProyectos'), misProyectos.length, 800);
+    animateCounter(document.getElementById('actDisenios'),  misDisenios.length,  900);
+  }
+
+  /**
+   * Valida y procesa el cambio de contraseña del usuario.
+   * @param {Object} user - Usuario autenticado en sesión.
+   */
+  function handleCambiarPassword(user) {
+    const actual   = document.getElementById('pwdActual').value;
+    const nueva    = document.getElementById('pwdNueva').value;
+    const confirm  = document.getElementById('pwdConfirm').value;
+    let hasError   = false;
+
+    // Validar contraseña actual
+    if (actual !== user.password) {
+      setFieldError('pwdActual', 'pwdActualErr', true);
+      document.getElementById('pwdActualErr').textContent = 'La contraseña actual es incorrecta.';
+      hasError = true;
+    } else {
+      setFieldError('pwdActual', 'pwdActualErr', false);
+    }
+
+    // Validar nueva contraseña (mínimo 8 caracteres)
+    if (nueva.length < 8) {
+      setFieldError('pwdNueva', 'pwdNuevaErr', true);
+      hasError = true;
+    } else {
+      setFieldError('pwdNueva', 'pwdNuevaErr', false);
+    }
+
+    // Validar confirmación
+    if (nueva !== confirm) {
+      setFieldError('pwdConfirm', 'pwdConfirmErr', true);
+      hasError = true;
+    } else {
+      setFieldError('pwdConfirm', 'pwdConfirmErr', false);
+    }
+
+    if (hasError) return;
+
+    // En producción aquí se enviaría un PATCH /api/users/:id/password
+    showToast('Contraseña actualizada correctamente ✓', 'success', 3000);
+    document.getElementById('formCambiarPwd').reset();
+  }
+
+  /** Pide confirmación antes de cerrar sesión. */
+  function confirmLogout() {
+    if (confirm('¿Seguro que desea cerrar la sesión del sistema?')) {
+      logout();
+    }
+  }
+
+  /** Inicializa el toggle de notificaciones con efecto visual. */
+  function initToggleNotif() {
+    const toggle = document.getElementById('toggleNotif');
+    const track  = document.getElementById('toggleNotifTrack');
+    const thumb  = document.getElementById('toggleNotifThumb');
+
+    toggle.addEventListener('change', () => {
+      if (toggle.checked) {
+        track.style.background = 'var(--primary-600)';
+        thumb.style.transform  = 'translateX(0)';
+        showToast('Notificaciones por correo activadas.', 'success', 2000);
+      } else {
+        track.style.background = 'var(--border)';
+        thumb.style.transform  = 'translateX(18px)';
+        showToast('Notificaciones por correo desactivadas.', 'info', 2000);
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = requireAuth();
+    if (!user) return;
+
+    renderSidebarUser(user);
+    renderPerfil(user);
+    initCommon();
+    initToggleNotif();
+
+    document.getElementById('btnCambiarPwd').addEventListener('click', () => {
+      handleCambiarPassword(user);
+    });
+  });
+</script>
+</body>
+</html>

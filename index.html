@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iniciar Sesión — Sistema de Diseño Integrado de Circuitos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=3.0.0" />
+  <style>
+    /* Estilos específicos del login — no van en styles.css por ser pantalla independiente */
+    .login-bg-circles {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .login-bg-circles span {
+      position: absolute; border-radius: 50%;
+      background: rgba(46,117,182,.12); animation: floatBubble 8s ease-in-out infinite;
+    }
+    .login-bg-circles span:nth-child(1) { width:300px;height:300px;top:-80px;right:-60px;animation-delay:0s; }
+    .login-bg-circles span:nth-child(2) { width:180px;height:180px;bottom:60px;left:-40px;animation-delay:3s; }
+    .login-bg-circles span:nth-child(3) { width:120px;height:120px;top:40%;left:10%;animation-delay:5s; }
+    @keyframes floatBubble {
+      0%,100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-20px) scale(1.05); }
+    }
+    .version-tag {
+      display: inline-block; background: rgba(46,117,182,.2);
+      color: var(--primary-200); font-size: .65rem; font-weight: 700;
+      padding: 2px 8px; border-radius: var(--r-full);
+      letter-spacing: .08em; margin-bottom: 6px;
+    }
+    .input-with-icon { position: relative; }
+    .input-with-icon .input-icon {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 19px; pointer-events: none;
+    }
+    .input-with-icon .form-control { padding-left: 38px; }
+    .toggle-password {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 19px; padding: 0;
+    }
+    .toggle-password:hover { color: var(--primary-600); }
+    .error-banner {
+      background: var(--error-bg); border: 1px solid var(--error);
+      color: var(--error); border-radius: var(--r-md);
+      padding: 10px 14px; font-size: .8rem; margin-bottom: 14px;
+      display: none; align-items: center; gap: 8px;
+    }
+    .error-banner.show { display: flex; }
+    .loading-overlay {
+      position: absolute; inset: 0; background: rgba(255,255,255,.85);
+      display: none; align-items: center; justify-content: center;
+      border-radius: var(--r-xl); flex-direction: column; gap: 12px;
+      font-size: .85rem; color: var(--text-secondary);
+    }
+    .loading-overlay.show { display: flex; }
+  </style>
+</head>
+<body>
+
+<main class="login-page" role="main">
+  <!-- Círculos decorativos de fondo -->
+  <div class="login-bg-circles" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </div>
+
+  <!-- Tarjeta de Login -->
+  <article class="login-card" style="position:relative;">
+
+    <!-- Overlay de carga -->
+    <div class="loading-overlay" id="loadingOverlay" aria-live="polite">
+      <div class="spinner"></div>
+      <span>Verificando credenciales…</span>
+    </div>
+
+    <!-- Logo e identidad -->
+    <div class="login-logo" role="img" aria-label="Sistema de Diseño Integrado de Circuitos">
+      ⚡
+    </div>
+    <div class="login-title">
+      <span class="version-tag">v3.0 · SENA Ficha 3118306</span>
+      <h2>Iniciar Sesión</h2>
+      <p>Sistema de Diseño Integrado de Circuitos</p>
+    </div>
+
+    <!-- Banner de error -->
+    <div class="error-banner" id="errorBanner" role="alert">
+      <span class="material-icons-round" style="font-size:18px;">error_outline</span>
+      <span id="errorMsg">Credenciales incorrectas.</span>
+    </div>
+
+    <!-- Cuenta de acceso -->
+    <div class="demo-accounts" role="note" aria-label="Cuenta de acceso al sistema">
+      <strong>🔑 Acceso al sistema:</strong>
+      <div class="demo-item">
+        <span>Administrador</span>
+        <span class="text-mono">michael.olivares@sena.edu.co / admin123</span>
+      </div>
+    </div>
+
+    <!-- Formulario de autenticación -->
+    <form id="loginForm" novalidate>
+
+      <!-- Campo Email -->
+      <div class="form-group">
+        <label class="form-label" for="emailInput">
+          Correo electrónico <span class="required" aria-hidden="true">*</span>
+        </label>
+        <div class="input-with-icon">
+          <span class="material-icons-round input-icon" aria-hidden="true">email</span>
+          <input
+            type="email"
+            id="emailInput"
+            class="form-control"
+            placeholder="usuario@sena.edu.co"
+            autocomplete="email"
+            required
+            aria-describedby="emailError"
+          />
+        </div>
+        <span class="form-error" id="emailError">Ingrese un correo electrónico válido.</span>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="form-group">
+        <label class="form-label" for="passwordInput">
+          Contraseña <span class="required" aria-hidden="true">*</span>
+        </label>
+        <div class="input-with-icon">
+          <span class="material-icons-round input-icon" aria-hidden="true">lock</span>
+          <input
+            type="password"
+            id="passwordInput"
+            class="form-control"
+            placeholder="••••••••••"
+            autocomplete="current-password"
+            required
+            aria-describedby="passwordError"
+          />
+          <button type="button" class="toggle-password" id="togglePwd" title="Mostrar/ocultar contraseña" aria-label="Mostrar contraseña">
+            <span class="material-icons-round" id="togglePwdIcon">visibility</span>
+          </button>
+        </div>
+        <span class="form-error" id="passwordError">La contraseña es requerida.</span>
+      </div>
+
+      <!-- Botón submit -->
+      <button type="submit" class="btn-login" id="loginBtn">
+        <span class="material-icons-round" aria-hidden="true">login</span>
+        Ingresar al Sistema
+      </button>
+
+    </form>
+
+    <!-- Enlace recuperación -->
+    <p class="forgot-link">
+      <a href="#" id="forgotLink">¿Olvidó su contraseña?</a>
+    </p>
+
+    <!-- Footer institucional -->
+    <footer class="login-footer">
+      <p>SENA · Regional Distrito Capital · Centro Metalmecánico</p>
+      <p>Tecnología en Análisis y Desarrollo de Software · Ficha 3118306</p>
+      <p style="margin-top:4px;">GA7-220501096-AA3-EV01 · Michael Ronald Olivares Giraldo</p>
+    </footer>
+
+  </article>
+</main>
+
+<!-- Toast container -->
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<script src="js/app.js?v=3.0.0"></script>
+<script>
+  'use strict';
+  /* ── Lógica específica de la pantalla Login ── */
+
+  /**
+   * Muestra u oculta el banner de error de credenciales.
+   * @param {string|null} msg - Mensaje a mostrar, o null para ocultar.
+   */
+  function setErrorBanner(msg) {
+    const banner = document.getElementById('errorBanner');
+    const msgEl  = document.getElementById('errorMsg');
+    if (msg) {
+      msgEl.textContent = msg;
+      banner.classList.add('show');
+    } else {
+      banner.classList.remove('show');
+    }
+  }
+
+  /** Activa o desactiva el overlay de carga sobre el formulario. */
+  function setLoading(state) {
+    document.getElementById('loadingOverlay').classList.toggle('show', state);
+    document.getElementById('loginBtn').disabled = state;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // Si ya hay sesión activa, redirigir directamente al dashboard
+    try {
+      const raw = sessionStorage.getItem('sdc_user');
+      if (raw) { navigate('pages/dashboard.html'); return; }
+    } catch (e) { /* sin sesión */ }
+
+    const form       = document.getElementById('loginForm');
+    const emailInput = document.getElementById('emailInput');
+    const pwdInput   = document.getElementById('passwordInput');
+    const toggleBtn  = document.getElementById('togglePwd');
+    const toggleIcon = document.getElementById('togglePwdIcon');
+    const forgotLink = document.getElementById('forgotLink');
+
+    /* ── Toggle visibilidad de contraseña ── */
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = pwdInput.type === 'password';
+      pwdInput.type        = isPassword ? 'text' : 'password';
+      toggleIcon.textContent = isPassword ? 'visibility_off' : 'visibility';
+    });
+
+    /* ── Limpia error al escribir ── */
+    emailInput.addEventListener('input', () => {
+      setFieldError('emailInput', 'emailError', false);
+      setErrorBanner(null);
+    });
+    pwdInput.addEventListener('input', () => {
+      setFieldError('passwordInput', 'passwordError', false);
+      setErrorBanner(null);
+    });
+
+    /* ── Recuperación de contraseña (simulada) ── */
+    forgotLink.addEventListener('click', e => {
+      e.preventDefault();
+      showToast('Se enviará un enlace de recuperación al correo registrado.', 'info', 4000);
+    });
+
+    /* ── Submit del formulario ── */
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      setErrorBanner(null);
+
+      const email    = emailInput.value.trim();
+      const password = pwdInput.value;
+      let hasError   = false;
+
+      // Validación de email
+      if (!validateEmail(email)) {
+        setFieldError('emailInput', 'emailError', true);
+        hasError = true;
+      }
+      // Validación de contraseña
+      if (!validateRequired(password)) {
+        setFieldError('passwordInput', 'passwordError', true);
+        hasError = true;
+      }
+      if (hasError) return;
+
+      // Simulación de latencia de red (300ms)
+      setLoading(true);
+      setTimeout(() => {
+        const result = authenticate(email, password);
+        setLoading(false);
+
+        if (result.ok) {
+          saveSession(result.user);
+          showToast(`Bienvenido, ${result.user.nombre} 👋`, 'success', 2000);
+          setTimeout(() => navigate('pages/dashboard.html'), 700);
+        } else {
+          setErrorBanner(result.error);
+          pwdInput.value = '';
+          pwdInput.focus();
+        }
+      }, 300);
+    });
+
+  });
+</script>
+</body>
+</html>

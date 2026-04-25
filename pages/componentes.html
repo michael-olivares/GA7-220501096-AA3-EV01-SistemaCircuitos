@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Componentes — SDC v3.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css?v=3.0.0" />
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menú principal">
+    <div class="sidebar-logo"><div class="logo-icon">⚡</div><div class="logo-title">SDC Sistema</div><div class="logo-sub">Diseño Integrado de Circuitos</div></div>
+    <p class="section-title">Principal</p>
+    <a href="dashboard.html"   class="nav-item" data-page="dashboard.html"><span class="material-icons-round nav-icon">dashboard</span> Panel</a>
+    <a href="proyectos.html"   class="nav-item" data-page="proyectos.html"><span class="material-icons-round nav-icon">folder_open</span> Proyectos</a>
+    <a href="disenios.html"    class="nav-item" data-page="disenios.html"><span class="material-icons-round nav-icon">design_services</span> Diseños</a>
+    <a href="componentes.html" class="nav-item" data-page="componentes.html"><span class="material-icons-round nav-icon">memory</span> Componentes</a>
+    <p class="section-title">Validación</p>
+    <a href="simulaciones.html" class="nav-item" data-page="simulaciones.html"><span class="material-icons-round nav-icon">science</span> Simulaciones</a>
+    <a href="proveedores.html"  class="nav-item" data-page="proveedores.html"><span class="material-icons-round nav-icon">local_shipping</span> Proveedores</a>
+    <p class="section-title">Cuenta</p>
+    <a href="perfil.html" class="nav-item" data-page="perfil.html"><span class="material-icons-round nav-icon">person</span> Mi Perfil</a>
+    <div class="sidebar-footer">
+      <div class="user-info"><div class="user-avatar" id="sidebarUserInit">MO</div>
+        <div><div class="user-name" id="sidebarUserName">Michael Olivares</div><div class="user-role" id="sidebarUserRole">Administrador</div></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="logout()" style="width:100%;margin-top:10px;color:var(--sidebar-txt);border-color:rgba(255,255,255,.2);"><span class="material-icons-round" style="font-size:16px;">logout</span> Cerrar sesión</button>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú"><span class="material-icons-round">menu</span></button>
+      <nav class="breadcrumb" aria-label="Ubicación"><a href="dashboard.html">Inicio</a> &rsaquo; <span>Componentes</span></nav>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary btn-sm" id="btnNuevoComp">
+        <span class="material-icons-round" style="font-size:16px;">add</span> Nuevo Componente
+      </button>
+    </div>
+  </header>
+
+  <main class="main-content" role="main">
+
+    <!-- Métricas rápidas -->
+    <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+      <div class="metric-card" style="--accent-color:var(--primary-600)">
+        <div class="metric-label">Total</div>
+        <div class="metric-value" id="cntTotal">0</div>
+        <div class="metric-sub">componentes</div>
+      </div>
+      <div class="metric-card" style="--accent-color:var(--success)">
+        <div class="metric-label">Disponibles</div>
+        <div class="metric-value" id="cntDisp">0</div>
+        <div class="metric-sub">en stock</div>
+      </div>
+      <div class="metric-card" style="--accent-color:var(--error)">
+        <div class="metric-label">Sin Stock</div>
+        <div class="metric-value" id="cntNoDisp">0</div>
+        <div class="metric-sub">agotados</div>
+      </div>
+      <div class="metric-card" style="--accent-color:var(--warning)">
+        <div class="metric-label">Categorías</div>
+        <div class="metric-value" id="cntCat">0</div>
+        <div class="metric-sub">diferentes</div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-bar" style="margin-bottom:14px;">
+      <div class="search-box" style="flex:1;max-width:300px;">
+        <span class="material-icons-round search-icon">search</span>
+        <input type="text" id="searchComp" class="form-control" placeholder="Buscar componente…" aria-label="Buscar componente" />
+      </div>
+      <button class="filter-chip active" data-cat="todos">Todos</button>
+      <button class="filter-chip" data-cat="Microcontrolador">MCU</button>
+      <button class="filter-chip" data-cat="Resistor">Resistores</button>
+      <button class="filter-chip" data-cat="Capacitor">Capacitores</button>
+      <button class="filter-chip" data-cat="FPGA">FPGA</button>
+      <select id="filterDisp" class="form-control" style="width:auto;padding:5px 10px;font-size:.78rem;" aria-label="Filtrar por disponibilidad">
+        <option value="">Disponibilidad: Todos</option>
+        <option value="true">Disponibles</option>
+        <option value="false">Sin stock</option>
+      </select>
+    </div>
+
+    <!-- Tabla de componentes -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Catálogo de Componentes <span id="countComp" style="font-size:.8rem;color:var(--text-muted);font-weight:400;"></span></h3>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table" aria-label="Catálogo de componentes electrónicos">
+          <thead>
+            <tr>
+              <th>Componente</th>
+              <th>Categoría</th>
+              <th>Fabricante</th>
+              <th>Modelo</th>
+              <th>Footprint</th>
+              <th>Precio USD</th>
+              <th>Disponibilidad</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="compBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal Nuevo Componente -->
+<div class="modal-overlay" id="modalComp" role="dialog" aria-modal="true" aria-labelledby="modalCompTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title" id="modalCompTitle">Nuevo Componente</div><div class="modal-sub">Registrar en el catálogo del sistema</div></div>
+      <button class="modal-close" onclick="closeModal('modalComp')" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="formComp" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="cNombre">Nombre <span class="required">*</span></label>
+          <input type="text" id="cNombre" class="form-control" placeholder="Ej: STM32F407VGT6" required aria-describedby="cNombreErr" />
+          <span class="form-error" id="cNombreErr">El nombre es requerido.</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="cCat">Categoría <span class="required">*</span></label>
+            <select id="cCat" class="form-control" required aria-describedby="cCatErr">
+              <option value="">— Seleccionar —</option>
+              <option value="Microcontrolador">Microcontrolador</option>
+              <option value="Resistor">Resistor</option>
+              <option value="Capacitor">Capacitor</option>
+              <option value="Regulador">Regulador</option>
+              <option value="Amplificador">Amplificador</option>
+              <option value="FPGA">FPGA</option>
+              <option value="Cristal">Cristal</option>
+              <option value="Transistor">Transistor</option>
+              <option value="Otro">Otro</option>
+            </select>
+            <span class="form-error" id="cCatErr">Seleccione una categoría.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cFab">Fabricante <span class="required">*</span></label>
+            <input type="text" id="cFab" class="form-control" placeholder="Ej: STMicroelectronics" required aria-describedby="cFabErr" />
+            <span class="form-error" id="cFabErr">El fabricante es requerido.</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="cModelo">Modelo <span class="required">*</span></label>
+            <input type="text" id="cModelo" class="form-control" placeholder="Ej: STM32F407VGT6" required aria-describedby="cModeloErr" />
+            <span class="form-error" id="cModeloErr">El modelo es requerido.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cPrecio">Precio (USD)</label>
+            <input type="number" id="cPrecio" class="form-control" placeholder="0.00" min="0" step="0.01" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="cFootprint">Footprint</label>
+            <input type="text" id="cFootprint" class="form-control" placeholder="Ej: LQFP-100" />
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:4px;gap:8px;">
+            <input type="checkbox" id="cDisp" checked style="width:16px;height:16px;cursor:pointer;" />
+            <label for="cDisp" style="font-size:.82rem;font-weight:600;cursor:pointer;">Disponible en stock</label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalComp')">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarComp">
+        <span class="material-icons-round" style="font-size:16px;">save</span> Guardar Componente
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+<script src="../js/app.js?v=3.0.0"></script>
+<script>
+  'use strict';
+
+  let catFilter  = 'todos';
+  let dispFilter = '';
+  let searchQ    = '';
+
+  /** Filtra componentes según búsqueda, categoría y disponibilidad. */
+  function getFilteredComps() {
+    return repoComponentes.filter(c => {
+      const matchCat  = catFilter === 'todos' || c.categoria === catFilter;
+      const matchDisp = dispFilter === '' || String(c.disponibilidad) === dispFilter;
+      const matchSrch = !searchQ  ||
+        c.nombre.toLowerCase().includes(searchQ) ||
+        c.fabricante.toLowerCase().includes(searchQ) ||
+        c.modelo.toLowerCase().includes(searchQ);
+      return matchCat && matchDisp && matchSrch;
+    });
+  }
+
+  /**
+   * Renderiza la tabla de componentes.
+   * @param {Array} comps - Lista de componentes.
+   */
+  function renderTablaComps(comps) {
+    const tbody = document.getElementById('compBody');
+    const count = document.getElementById('countComp');
+    count.textContent = `(${comps.length} resultados)`;
+
+    if (comps.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔧</div><p>No se encontraron componentes.</p></div></td></tr>`;
+      return;
+    }
+
+    const CAT_ICONS = { Microcontrolador:'🔬', Resistor:'〰️', Capacitor:'⚡', Regulador:'🔋', Amplificador:'📢', FPGA:'🔷', Cristal:'💎', Transistor:'🔲', Otro:'🔧' };
+
+    tbody.innerHTML = comps.map(c => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:1.2rem;">${CAT_ICONS[c.categoria] ?? '🔧'}</span>
+            <span style="font-weight:600;">${c.nombre}</span>
+          </div>
+        </td>
+        <td><span class="chip">${c.categoria}</span></td>
+        <td>${c.fabricante}</td>
+        <td class="td-mono">${c.modelo}</td>
+        <td class="td-mono">${c.footprint || '—'}</td>
+        <td style="font-weight:600;">${fmtPrice(c.precio)}</td>
+        <td>
+          <span class="badge ${c.disponibilidad ? 'badge-success' : 'badge-error'}">
+            ${c.disponibilidad ? '✓ Disponible' : '✗ Sin stock'}
+          </span>
+        </td>
+        <td>
+          <div style="display:flex;gap:4px;">
+            <button class="btn-icon" title="Toggle disponibilidad"
+              onclick="toggleDisponibilidad(${c.id})" aria-label="Cambiar disponibilidad">
+              <span class="material-icons-round">${c.disponibilidad ? 'toggle_on' : 'toggle_off'}</span>
+            </button>
+            <button class="btn-icon" title="Eliminar" style="color:var(--error);"
+              onclick="eliminarComp(${c.id})" aria-label="Eliminar ${c.nombre}">
+              <span class="material-icons-round">delete</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  /** Actualiza las tarjetas de métricas de componentes. */
+  function actualizarMetricas() {
+    const todos  = repoComponentes.getAll();
+    const disp   = todos.filter(c => c.disponibilidad);
+    const cats   = new Set(todos.map(c => c.categoria));
+
+    document.getElementById('cntTotal').textContent  = todos.length;
+    document.getElementById('cntDisp').textContent   = disp.length;
+    document.getElementById('cntNoDisp').textContent = todos.length - disp.length;
+    document.getElementById('cntCat').textContent    = cats.size;
+  }
+
+  /**
+   * Cambia la disponibilidad de un componente.
+   * @param {number} id - ID del componente.
+   */
+  function toggleDisponibilidad(id) {
+    const comp = repoComponentes.findById(id);
+    if (!comp) return;
+    repoComponentes.update(id, { disponibilidad: !comp.disponibilidad });
+    actualizarMetricas();
+    renderTablaComps(getFilteredComps());
+    showToast(`Disponibilidad de "${comp.nombre}" actualizada.`, 'info');
+  }
+
+  /**
+   * Elimina un componente del catálogo.
+   * @param {number} id - ID del componente.
+   */
+  function eliminarComp(id) {
+    const comp = repoComponentes.findById(id);
+    if (!comp) return;
+    if (!confirm(`¿Eliminar "${comp.nombre}" del catálogo?`)) return;
+    repoComponentes.remove(id);
+    actualizarMetricas();
+    renderTablaComps(getFilteredComps());
+    showToast(`"${comp.nombre}" eliminado del catálogo.`, 'warning');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = requireAuth();
+    if (!user) return;
+    renderSidebarUser(user);
+    initCommon();
+    actualizarMetricas();
+    renderTablaComps(getFilteredComps());
+
+    document.getElementById('searchComp').addEventListener('input', e => {
+      searchQ = e.target.value.toLowerCase().trim();
+      renderTablaComps(getFilteredComps());
+    });
+    document.querySelectorAll('.filter-chip[data-cat]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip[data-cat]').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        catFilter = chip.dataset.cat;
+        renderTablaComps(getFilteredComps());
+      });
+    });
+    document.getElementById('filterDisp').addEventListener('change', e => {
+      dispFilter = e.target.value;
+      renderTablaComps(getFilteredComps());
+    });
+    document.getElementById('btnNuevoComp').addEventListener('click', () => {
+      document.getElementById('formComp').reset();
+      openModal('modalComp');
+    });
+    document.getElementById('btnGuardarComp').addEventListener('click', () => {
+      const nombre = document.getElementById('cNombre').value.trim();
+      const cat    = document.getElementById('cCat').value;
+      const fab    = document.getElementById('cFab').value.trim();
+      const modelo = document.getElementById('cModelo').value.trim();
+      const precio = parseFloat(document.getElementById('cPrecio').value) || 0;
+      const foot   = document.getElementById('cFootprint').value.trim();
+      const disp   = document.getElementById('cDisp').checked;
+      let err = false;
+
+      if (!validateRequired(nombre)) { setFieldError('cNombre','cNombreErr',true); err=true; } else setFieldError('cNombre','cNombreErr',false);
+      if (!validateRequired(cat))    { setFieldError('cCat','cCatErr',true); err=true; }    else setFieldError('cCat','cCatErr',false);
+      if (!validateRequired(fab))    { setFieldError('cFab','cFabErr',true); err=true; }    else setFieldError('cFab','cFabErr',false);
+      if (!validateRequired(modelo)) { setFieldError('cModelo','cModeloErr',true); err=true; } else setFieldError('cModelo','cModeloErr',false);
+      if (err) return;
+
+      repoComponentes.add({ nombre, categoria:cat, fabricante:fab, modelo, precio, footprint:foot, disponibilidad:disp });
+      actualizarMetricas();
+      renderTablaComps(getFilteredComps());
+      closeModal('modalComp');
+      showToast(`Componente "${nombre}" registrado en el catálogo ✓`, 'success');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diseños — SDC v3.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css?v=3.0.0" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menú principal">
+    <div class="sidebar-logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-title">SDC Sistema</div>
+      <div class="logo-sub">Diseño Integrado de Circuitos</div>
+    </div>
+    <p class="section-title">Principal</p>
+    <a href="dashboard.html"   class="nav-item" data-page="dashboard.html"><span class="material-icons-round nav-icon">dashboard</span> Panel</a>
+    <a href="proyectos.html"   class="nav-item" data-page="proyectos.html"><span class="material-icons-round nav-icon">folder_open</span> Proyectos</a>
+    <a href="disenios.html"    class="nav-item" data-page="disenios.html"><span class="material-icons-round nav-icon">design_services</span> Diseños</a>
+    <a href="componentes.html" class="nav-item" data-page="componentes.html"><span class="material-icons-round nav-icon">memory</span> Componentes</a>
+    <p class="section-title">Validación</p>
+    <a href="simulaciones.html" class="nav-item" data-page="simulaciones.html"><span class="material-icons-round nav-icon">science</span> Simulaciones</a>
+    <a href="proveedores.html"  class="nav-item" data-page="proveedores.html"><span class="material-icons-round nav-icon">local_shipping</span> Proveedores</a>
+    <p class="section-title">Cuenta</p>
+    <a href="perfil.html" class="nav-item" data-page="perfil.html"><span class="material-icons-round nav-icon">person</span> Mi Perfil</a>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebarUserInit">MO</div>
+        <div>
+          <div class="user-name" id="sidebarUserName">Michael Olivares</div>
+          <div class="user-role" id="sidebarUserRole">Administrador</div>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="logout()" style="width:100%;margin-top:10px;color:var(--sidebar-txt);border-color:rgba(255,255,255,.2);">
+        <span class="material-icons-round" style="font-size:16px;">logout</span> Cerrar sesión
+      </button>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ── TOPBAR ─────────────────────────────────────── -->
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú"><span class="material-icons-round">menu</span></button>
+      <nav class="breadcrumb" aria-label="Ubicación">
+        <a href="dashboard.html">Inicio</a> &rsaquo;
+        <a href="proyectos.html">Proyectos</a> &rsaquo;
+        <span>Diseños</span>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary btn-sm" id="btnNuevoDisenio">
+        <span class="material-icons-round" style="font-size:16px;">add</span> Nuevo Diseño
+      </button>
+    </div>
+  </header>
+
+  <!-- ── CONTENIDO PRINCIPAL ────────────────────────── -->
+  <main class="main-content" role="main">
+
+    <!-- Filtros -->
+    <div class="filter-bar" role="toolbar" aria-label="Filtros de diseños">
+      <div class="search-box" style="flex:1;max-width:300px;">
+        <span class="material-icons-round search-icon" aria-hidden="true">search</span>
+        <input type="text" id="searchDisenio" class="form-control" placeholder="Buscar diseño…" aria-label="Buscar diseño" />
+      </div>
+      <button class="filter-chip active" data-filter="todos">Todos</button>
+      <button class="filter-chip" data-filter="esquematico">Esquemático</button>
+      <button class="filter-chip" data-filter="pcb">PCB</button>
+      <button class="filter-chip" data-filter="layout">Layout</button>
+      <select id="filterEstado" class="form-control" style="width:auto;padding:5px 10px;font-size:.78rem;" aria-label="Filtrar por estado">
+        <option value="">Estado: Todos</option>
+        <option value="aprobado">Aprobado</option>
+        <option value="revision">En Revisión</option>
+        <option value="borrador">Borrador</option>
+      </select>
+    </div>
+
+    <!-- Tabla de diseños -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Gestión de Diseños <span id="countDisenios" style="font-size:.8rem;color:var(--text-muted);font-weight:400;"></span></h3>
+        <div class="table-actions">
+          <button class="btn-icon" title="Exportar CSV" aria-label="Exportar a CSV" id="btnExportCSV">
+            <span class="material-icons-round">download</span>
+          </button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table" aria-label="Tabla de diseños electrónicos">
+          <thead>
+            <tr>
+              <th>Nombre del Diseño</th>
+              <th>Tipo</th>
+              <th>Proyecto</th>
+              <th>Estado</th>
+              <th>Versión</th>
+              <th>Herramienta</th>
+              <th>Responsable</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="diseniosBody">
+            <!-- Renderizado con JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── PANEL DE DETALLE ──────────────────────────────── -->
+<aside class="detail-panel" id="detailPanel" role="complementary" aria-label="Detalle del diseño">
+  <div class="detail-panel-header">
+    <h3 style="font-size:.9rem;" id="detailTitle">Detalle del Diseño</h3>
+    <button class="btn-icon" onclick="closeDetailPanel()" aria-label="Cerrar panel">
+      <span class="material-icons-round">close</span>
+    </button>
+  </div>
+  <div class="detail-panel-body" id="detailBody"></div>
+</aside>
+
+<!-- ── MODAL CREAR / EDITAR DISEÑO ──────────────────── -->
+<div class="modal-overlay" id="modalDisenio" role="dialog" aria-modal="true" aria-labelledby="modalDisenioTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalDisenioTitle">Crear Nuevo Diseño</div>
+        <div class="modal-sub">Los campos marcados con * son obligatorios</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalDisenio')" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="formDisenio" novalidate>
+        <!-- Nombre -->
+        <div class="form-group">
+          <label class="form-label" for="dNombre">Nombre del Diseño <span class="required">*</span></label>
+          <input type="text" id="dNombre" class="form-control" placeholder="Ej: Esquemático Control PWM v3.0" maxlength="200" required aria-describedby="dNombreErr" />
+          <span class="form-error" id="dNombreErr">El nombre es requerido.</span>
+        </div>
+        <!-- Tipo y Estado -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="dTipo">Tipo de Diseño <span class="required">*</span></label>
+            <select id="dTipo" class="form-control" required aria-describedby="dTipoErr">
+              <option value="">— Seleccionar —</option>
+              <option value="esquematico">Esquemático</option>
+              <option value="pcb">PCB</option>
+              <option value="layout">Layout</option>
+            </select>
+            <span class="form-error" id="dTipoErr">Seleccione el tipo.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="dEstado">Estado Inicial</label>
+            <select id="dEstado" class="form-control">
+              <option value="borrador">Borrador</option>
+              <option value="revision">En Revisión</option>
+              <option value="aprobado">Aprobado</option>
+            </select>
+          </div>
+        </div>
+        <!-- Proyecto y Herramienta -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="dProyecto">Proyecto <span class="required">*</span></label>
+            <select id="dProyecto" class="form-control" required aria-describedby="dProyectoErr">
+              <option value="">— Seleccionar proyecto —</option>
+            </select>
+            <span class="form-error" id="dProyectoErr">Seleccione el proyecto.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="dFormato">Herramienta / Formato</label>
+            <select id="dFormato" class="form-control">
+              <option value="KiCad 7.0">KiCad 7.0</option>
+              <option value="Altium 23">Altium Designer 23</option>
+              <option value="Cadence">Cadence Virtuoso</option>
+              <option value="Vivado">Xilinx Vivado</option>
+              <option value="Eagle">Eagle CAD</option>
+            </select>
+          </div>
+        </div>
+        <!-- Versión y cifrado -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="dVersion">Versión Inicial</label>
+            <input type="text" id="dVersion" class="form-control" placeholder="Ej: v1.0" maxlength="20" />
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:4px;gap:8px;">
+            <input type="checkbox" id="dCifrado" style="width:16px;height:16px;cursor:pointer;" />
+            <label for="dCifrado" style="font-size:.82rem;font-weight:600;cursor:pointer;">Archivo cifrado</label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalDisenio')">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarDisenio">
+        <span class="material-icons-round" style="font-size:16px;">save</span> Crear Diseño
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<script src="../js/app.js?v=3.0.0"></script>
+<script>
+  'use strict';
+  /* ── Lógica específica de Diseños ── */
+
+  /** Versiones mock por diseño (simulan tabla 'version') */
+  const MOCK_VERSIONES = {
+    1: [{ tag:'v1.3', desc:'Versión release para fabricación', release:true }, { tag:'v1.2', desc:'Optimización del ruteo', release:false }, { tag:'v1.0', desc:'Diseño inicial', release:false }],
+    2: [{ tag:'v1.0', desc:'Diseño inicial PCB 4 capas', release:false }],
+    3: [{ tag:'v2.0', desc:'Diseño esquemático LoRaWAN inicial', release:true }, { tag:'v2.0.1', desc:'Corrección footprint antena', release:false }],
+    4: [{ tag:'v2.0', desc:'PCB LoRaWAN con antena integrada', release:true }],
+    5: [{ tag:'v3.1', desc:'Layout ASIC final post-síntesis', release:true }],
+    6: [{ tag:'v1.0', desc:'Esquemático inicial FPGA Artix-7', release:false }]
+  };
+
+  let activeFilter  = 'todos';
+  let activeEstado  = '';
+  let searchQuery   = '';
+
+  /**
+   * Devuelve la lista de diseños aplicando todos los filtros activos.
+   * @returns {Array} Diseños filtrados.
+   */
+  function getFilteredDisenios() {
+    return repoDisenios.filter(d => {
+      const matchesTipo   = activeFilter === 'todos' || d.tipo === activeFilter;
+      const matchesEstado = !activeEstado || d.estado === activeEstado;
+      const matchesSearch = !searchQuery  ||
+        d.nombre.toLowerCase().includes(searchQuery) ||
+        d.formato.toLowerCase().includes(searchQuery) ||
+        d.creador.toLowerCase().includes(searchQuery);
+      return matchesTipo && matchesEstado && matchesSearch;
+    });
+  }
+
+  /**
+   * Renderiza la tabla de diseños con los datos filtrados.
+   * @param {Array} disenios - Lista de diseños a mostrar.
+   */
+  function renderTablaDisenios(disenios) {
+    const tbody = document.getElementById('diseniosBody');
+    const count = document.getElementById('countDisenios');
+    if (!tbody) return;
+
+    count.textContent = `(${disenios.length} resultados)`;
+
+    if (disenios.length === 0) {
+      tbody.innerHTML = `
+        <tr><td colspan="8">
+          <div class="empty-state"><div class="empty-icon">📐</div>
+          <p>No se encontraron diseños con los filtros aplicados.</p></div>
+        </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = disenios.map(d => {
+      const proyecto = repoProyectos.findById(d.id_proyecto);
+      return `
+        <tr style="cursor:pointer;" onclick="handleSelectDisenio(${d.id})">
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:1.2rem;" aria-hidden="true">${getTipoIcon(d.tipo)}</span>
+              <div>
+                <div style="font-weight:600;">${d.nombre}</div>
+                ${d.cifrado ? '<div class="text-muted">🔒 Archivo cifrado</div>' : ''}
+              </div>
+            </div>
+          </td>
+          <td><span class="chip">${capitalizeFirst(d.tipo)}</span></td>
+          <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${proyecto ? proyecto.nombre : '—'}
+          </td>
+          <td><span class="badge ${getBadgeClass(d.estado)}">${capitalizeFirst(d.estado)}</span></td>
+          <td><span class="td-mono text-mono">${d.version}</span></td>
+          <td class="text-muted">${d.formato}</td>
+          <td>${d.creador}</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <button class="btn-icon" title="Editar" aria-label="Editar diseño ${d.nombre}"
+                onclick="event.stopPropagation();handleEditarDisenio(${d.id})">
+                <span class="material-icons-round">edit</span>
+              </button>
+              <button class="btn-icon" title="Eliminar" aria-label="Eliminar diseño ${d.nombre}"
+                onclick="event.stopPropagation();handleEliminarDisenio(${d.id})"
+                style="color:var(--error);">
+                <span class="material-icons-round">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /**
+   * Abre el panel de detalle para el diseño seleccionado.
+   * @param {number} id - ID del diseño.
+   */
+  function handleSelectDisenio(id) {
+    const d = repoDisenios.findById(id);
+    if (!d) return;
+
+    const proyecto   = repoProyectos.findById(d.id_proyecto);
+    const versiones  = MOCK_VERSIONES[id] || [];
+    const simulaciones = repoSimulaciones.filter(s => s.id_diseno === id);
+
+    document.getElementById('detailTitle').textContent = d.nombre;
+    document.getElementById('detailBody').innerHTML = `
+      <div class="detail-section">
+        <div class="detail-section-title">Información del Diseño</div>
+        <div class="detail-row"><span class="detail-key">Tipo</span>
+          <span class="detail-val">${getTipoIcon(d.tipo)} ${capitalizeFirst(d.tipo)}</span></div>
+        <div class="detail-row"><span class="detail-key">Estado</span>
+          <span class="badge ${getBadgeClass(d.estado)}">${capitalizeFirst(d.estado)}</span></div>
+        <div class="detail-row"><span class="detail-key">Herramienta</span>
+          <span class="detail-val">${d.formato}</span></div>
+        <div class="detail-row"><span class="detail-key">Versión</span>
+          <span class="detail-val text-mono">${d.version}</span></div>
+        <div class="detail-row"><span class="detail-key">Responsable</span>
+          <span class="detail-val">${d.creador}</span></div>
+        <div class="detail-row"><span class="detail-key">Cifrado</span>
+          <span class="detail-val">${d.cifrado ? '🔒 Sí' : '🔓 No'}</span></div>
+        <div class="detail-row"><span class="detail-key">Fecha</span>
+          <span class="detail-val">${formatDate(d.fecha)}</span></div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Proyecto</div>
+        <div style="font-weight:600;font-size:.84rem;">${proyecto ? proyecto.nombre : '—'}</div>
+        <div class="text-muted">${proyecto ? capitalizeFirst(proyecto.tipo_circuito) : ''}</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Historial de Versiones (${versiones.length})</div>
+        <div class="version-list">
+          ${versiones.map(v => `
+            <div class="version-item">
+              <div>
+                <div class="version-tag">${v.tag}</div>
+                <div class="text-muted">${v.desc}</div>
+              </div>
+              ${v.release ? '<span class="badge badge-success">Release</span>' : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Simulaciones Asociadas (${simulaciones.length})</div>
+        ${simulaciones.length === 0 ? '<p class="text-muted" style="font-size:.8rem;">Sin simulaciones registradas.</p>' :
+          simulaciones.map(s => `
+            <div class="version-item" style="margin-bottom:4px;">
+              <div>
+                <div style="font-weight:600;font-size:.8rem;">${getTipoIcon(s.tipo)} ${capitalizeFirst(s.tipo)}</div>
+                <div class="text-muted">${s.metricas}</div>
+              </div>
+              <span class="badge ${getBadgeClass(s.estado)}">${capitalizeFirst(s.estado)}</span>
+            </div>
+          `).join('')
+        }
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn btn-primary btn-sm" onclick="handleEditarDisenio(${d.id})" style="flex:1;">
+          <span class="material-icons-round" style="font-size:15px;">edit</span> Editar
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="handleEliminarDisenio(${d.id})" style="flex:1;">
+          <span class="material-icons-round" style="font-size:15px;">delete</span> Eliminar
+        </button>
+      </div>
+    `;
+    openDetailPanel();
+  }
+
+  /**
+   * Pre-rellena el modal con los datos del diseño para editar.
+   * @param {number} id - ID del diseño.
+   */
+  function handleEditarDisenio(id) {
+    const d = repoDisenios.findById(id);
+    if (!d) return;
+
+    document.getElementById('modalDisenioTitle').textContent = 'Editar Diseño';
+    document.getElementById('dNombre').value  = d.nombre;
+    document.getElementById('dTipo').value    = d.tipo;
+    document.getElementById('dEstado').value  = d.estado;
+    document.getElementById('dProyecto').value = d.id_proyecto;
+    document.getElementById('dFormato').value  = d.formato;
+    document.getElementById('dVersion').value  = d.version;
+    document.getElementById('dCifrado').checked = d.cifrado;
+
+    const btn = document.getElementById('btnGuardarDisenio');
+    btn.dataset.editId = id;
+    btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">save</span> Guardar Cambios';
+
+    closeDetailPanel();
+    openModal('modalDisenio');
+  }
+
+  /**
+   * Elimina un diseño tras confirmación del usuario.
+   * @param {number} id - ID del diseño a eliminar.
+   */
+  function handleEliminarDisenio(id) {
+    const d = repoDisenios.findById(id);
+    if (!d) return;
+    if (!confirm(`¿Eliminar el diseño "${d.nombre}"?`)) return;
+
+    const ok = repoDisenios.remove(id);
+    if (ok) {
+      closeDetailPanel();
+      renderTablaDisenios(getFilteredDisenios());
+      showToast(`Diseño "${d.nombre}" eliminado.`, 'warning');
+    }
+  }
+
+  /** Exporta los diseños filtrados a CSV. */
+  function exportarCSV() {
+    const disenios = getFilteredDisenios();
+    const header   = ['ID','Nombre','Tipo','Estado','Versión','Herramienta','Responsable','Proyecto'].join(',');
+    const rows = disenios.map(d => {
+      const p = repoProyectos.findById(d.id_proyecto);
+      return [d.id, `"${d.nombre}"`, d.tipo, d.estado, d.version, d.formato, d.creador, `"${p ? p.nombre : ''}"`].join(',');
+    });
+    const csv  = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `disenios_sdc_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV exportado correctamente ✓', 'success');
+  }
+
+  /** Resetea el formulario del modal diseño. */
+  function resetFormDisenio() {
+    document.getElementById('formDisenio').reset();
+    document.getElementById('modalDisenioTitle').textContent = 'Crear Nuevo Diseño';
+    const btn = document.getElementById('btnGuardarDisenio');
+    delete btn.dataset.editId;
+    btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">save</span> Crear Diseño';
+    ['dNombre','dTipo','dProyecto'].forEach(id => setFieldError(id, id + 'Err', false));
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = requireAuth();
+    if (!user) return;
+
+    renderSidebarUser(user);
+    initCommon();
+
+    // Poblar select de proyectos en el modal
+    const selProyecto = document.getElementById('dProyecto');
+    repoProyectos.getAll().forEach(p => {
+      const opt = document.createElement('option');
+      opt.value       = p.id;
+      opt.textContent = p.nombre;
+      selProyecto.appendChild(opt);
+    });
+
+    renderTablaDisenios(getFilteredDisenios());
+
+    // Búsqueda
+    document.getElementById('searchDisenio').addEventListener('input', e => {
+      searchQuery = e.target.value.toLowerCase().trim();
+      renderTablaDisenios(getFilteredDisenios());
+    });
+
+    // Filtros por tipo chip
+    document.querySelectorAll('.filter-chip[data-filter]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip[data-filter]').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeFilter = chip.dataset.filter;
+        renderTablaDisenios(getFilteredDisenios());
+      });
+    });
+
+    // Filtro estado
+    document.getElementById('filterEstado').addEventListener('change', e => {
+      activeEstado = e.target.value;
+      renderTablaDisenios(getFilteredDisenios());
+    });
+
+    // Botón nuevo diseño
+    document.getElementById('btnNuevoDisenio').addEventListener('click', () => {
+      resetFormDisenio();
+      openModal('modalDisenio');
+    });
+
+    // Exportar CSV
+    document.getElementById('btnExportCSV').addEventListener('click', exportarCSV);
+
+    // Guardar diseño
+    document.getElementById('btnGuardarDisenio').addEventListener('click', () => {
+      const nombre   = document.getElementById('dNombre').value.trim();
+      const tipo     = document.getElementById('dTipo').value;
+      const estado   = document.getElementById('dEstado').value;
+      const proyecto = document.getElementById('dProyecto').value;
+      const formato  = document.getElementById('dFormato').value;
+      const version  = document.getElementById('dVersion').value.trim() || 'v1.0';
+      const cifrado  = document.getElementById('dCifrado').checked;
+      let hasError   = false;
+
+      if (!validateRequired(nombre))  { setFieldError('dNombre','dNombreErr',true); hasError = true; }
+      else setFieldError('dNombre','dNombreErr',false);
+      if (!validateRequired(tipo))    { setFieldError('dTipo','dTipoErr',true); hasError = true; }
+      else setFieldError('dTipo','dTipoErr',false);
+      if (!validateRequired(proyecto)){ setFieldError('dProyecto','dProyectoErr',true); hasError = true; }
+      else setFieldError('dProyecto','dProyectoErr',false);
+
+      if (hasError) return;
+
+      const btn    = document.getElementById('btnGuardarDisenio');
+      const editId = btn.dataset.editId ? parseInt(btn.dataset.editId) : null;
+
+      if (editId) {
+        repoDisenios.update(editId, { nombre, tipo, estado, formato, version, cifrado, id_proyecto: parseInt(proyecto) });
+        showToast(`Diseño "${nombre}" actualizado ✓`, 'success');
+      } else {
+        repoDisenios.add({
+          nombre, tipo, estado, formato, version, cifrado,
+          id_proyecto: parseInt(proyecto),
+          creador: user.nombre,
+          fecha: new Date().toISOString().slice(0,10),
+          versiones: 1
+        });
+        showToast(`Diseño "${nombre}" creado exitosamente ✓`, 'success');
+      }
+
+      closeModal('modalDisenio');
+      renderTablaDisenios(getFilteredDisenios());
+    });
+  });
+</script>
+</body>
+</html>

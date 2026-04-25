@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulaciones — SDC v3.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css?v=3.0.0" />
+  <style>
+    .sim-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 18px 20px;
+      box-shadow: var(--shadow-sm); margin-bottom: 12px;
+      transition: box-shadow var(--t-base);
+    }
+    .sim-card:hover { box-shadow: var(--shadow-md); }
+    .sim-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+    .sim-type-label { display:flex; align-items:center; gap:8px; }
+    .sim-type-label span { font-size:1.4rem; }
+    .sim-type-label h4 { font-size:.92rem; font-weight:700; }
+    .sim-meta { display:flex; flex-wrap:wrap; gap:12px; font-size:.78rem; color:var(--text-muted); }
+    .sim-metrics { background:var(--surface-alt); border-radius:var(--r-md); padding:10px 14px; margin-top:10px; font-family:var(--font-mono); font-size:.78rem; color:var(--primary-700); }
+    .progress-section { margin-top:10px; }
+    .progress-label { display:flex; justify-content:space-between; font-size:.72rem; margin-bottom:4px; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menú principal">
+    <div class="sidebar-logo"><div class="logo-icon">⚡</div><div class="logo-title">SDC Sistema</div><div class="logo-sub">Diseño Integrado de Circuitos</div></div>
+    <p class="section-title">Principal</p>
+    <a href="dashboard.html"   class="nav-item" data-page="dashboard.html"><span class="material-icons-round nav-icon">dashboard</span> Panel</a>
+    <a href="proyectos.html"   class="nav-item" data-page="proyectos.html"><span class="material-icons-round nav-icon">folder_open</span> Proyectos</a>
+    <a href="disenios.html"    class="nav-item" data-page="disenios.html"><span class="material-icons-round nav-icon">design_services</span> Diseños</a>
+    <a href="componentes.html" class="nav-item" data-page="componentes.html"><span class="material-icons-round nav-icon">memory</span> Componentes</a>
+    <p class="section-title">Validación</p>
+    <a href="simulaciones.html" class="nav-item" data-page="simulaciones.html"><span class="material-icons-round nav-icon">science</span> Simulaciones</a>
+    <a href="proveedores.html"  class="nav-item" data-page="proveedores.html"><span class="material-icons-round nav-icon">local_shipping</span> Proveedores</a>
+    <p class="section-title">Cuenta</p>
+    <a href="perfil.html" class="nav-item" data-page="perfil.html"><span class="material-icons-round nav-icon">person</span> Mi Perfil</a>
+    <div class="sidebar-footer">
+      <div class="user-info"><div class="user-avatar" id="sidebarUserInit">MO</div>
+        <div><div class="user-name" id="sidebarUserName">Michael Olivares</div><div class="user-role" id="sidebarUserRole">Administrador</div></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="logout()" style="width:100%;margin-top:10px;color:var(--sidebar-txt);border-color:rgba(255,255,255,.2);"><span class="material-icons-round" style="font-size:16px;">logout</span> Cerrar sesión</button>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú"><span class="material-icons-round">menu</span></button>
+      <nav class="breadcrumb" aria-label="Ubicación"><a href="dashboard.html">Inicio</a> &rsaquo; <span>Simulaciones</span></nav>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary btn-sm" id="btnNuevaSim">
+        <span class="material-icons-round" style="font-size:16px;">add</span> Nueva Simulación
+      </button>
+    </div>
+  </header>
+
+  <main class="main-content" role="main">
+
+    <!-- Métricas -->
+    <div class="metrics-grid" style="margin-bottom:20px;">
+      <div class="metric-card" style="--accent-color:var(--primary-600)"><div class="metric-label">Total</div><div class="metric-value" id="sTotal">0</div><div class="metric-sub">simulaciones</div></div>
+      <div class="metric-card" style="--accent-color:var(--success)"><div class="metric-label">Completadas</div><div class="metric-value" id="sComp">0</div><div class="metric-sub">con resultados</div></div>
+      <div class="metric-card" style="--accent-color:var(--warning)"><div class="metric-label">Pendientes</div><div class="metric-value" id="sPend">0</div><div class="metric-sub">en cola</div></div>
+      <div class="metric-card" style="--accent-color:var(--info)"><div class="metric-label">Tasa Éxito</div><div class="metric-value" id="sTasa">0%</div><div class="metric-sub">cumplen specs</div></div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-bar" style="margin-bottom:16px;">
+      <div class="search-box" style="flex:1;max-width:280px;">
+        <span class="material-icons-round search-icon">search</span>
+        <input type="text" id="searchSim" class="form-control" placeholder="Buscar simulación…" aria-label="Buscar" />
+      </div>
+      <button class="filter-chip active" data-tipo="todos">Todos</button>
+      <button class="filter-chip" data-tipo="analogica">Analógica</button>
+      <button class="filter-chip" data-tipo="digital">Digital</button>
+      <button class="filter-chip" data-tipo="mixta">Mixta</button>
+      <button class="filter-chip" data-tipo="termica">Térmica</button>
+      <button class="filter-chip" data-tipo="energetica">Energética</button>
+    </div>
+
+    <!-- Lista de simulaciones -->
+    <div id="simList" aria-live="polite" aria-label="Lista de simulaciones"></div>
+
+  </main>
+</div>
+
+<!-- Modal Nueva Simulación -->
+<div class="modal-overlay" id="modalSim" role="dialog" aria-modal="true" aria-labelledby="modalSimTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title" id="modalSimTitle">Nueva Simulación</div><div class="modal-sub">Programar análisis sobre un diseño</div></div>
+      <button class="modal-close" onclick="closeModal('modalSim')" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="formSim" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="sTipo">Tipo de Simulación <span class="required">*</span></label>
+            <select id="sTipo" class="form-control" required aria-describedby="sTipoErr">
+              <option value="">— Seleccionar —</option>
+              <option value="analogica">Analógica</option>
+              <option value="digital">Digital</option>
+              <option value="mixta">Mixta</option>
+              <option value="termica">Térmica</option>
+              <option value="energetica">Energética</option>
+            </select>
+            <span class="form-error" id="sTipoErr">El tipo es requerido.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sDisenio">Diseño <span class="required">*</span></label>
+            <select id="sDisenio" class="form-control" required aria-describedby="sDisenioErr">
+              <option value="">— Seleccionar diseño —</option>
+            </select>
+            <span class="form-error" id="sDisenioErr">Seleccione el diseño.</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="sMetricas">Métricas a Evaluar</label>
+          <input type="text" id="sMetricas" class="form-control" placeholder="Ej: THD, eficiencia, temperatura máxima" />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalSim')">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarSim">
+        <span class="material-icons-round" style="font-size:16px;">science</span> Programar Simulación
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+<script src="../js/app.js?v=3.0.0"></script>
+<script>
+  'use strict';
+
+  let tipoFilter = 'todos';
+  let simSearch  = '';
+
+  /** Duración en formato legible. */
+  function fmtDuracion(mins) {
+    if (!mins) return 'Pendiente';
+    if (mins < 60) return `${mins} min`;
+    return `${Math.floor(mins/60)}h ${mins%60}min`;
+  }
+
+  /** Devuelve simulaciones filtradas. */
+  function getFilteredSims() {
+    return repoSimulaciones.filter(s => {
+      const matchTipo  = tipoFilter === 'todos' || s.tipo === tipoFilter;
+      const d = repoDisenios.findById(s.id_diseno);
+      const matchSrch  = !simSearch || s.tipo.includes(simSearch) || (d && d.nombre.toLowerCase().includes(simSearch));
+      return matchTipo && matchSrch;
+    });
+  }
+
+  /** Actualiza métricas de simulaciones. */
+  function actualizarMetricasSim() {
+    const todas = repoSimulaciones.getAll();
+    const comp  = todas.filter(s => s.estado === 'completada');
+    const pend  = todas.filter(s => s.estado === 'pendiente');
+    const tasa  = comp.length > 0 ? Math.round((comp.filter(s => s.cumple).length / comp.length) * 100) : 0;
+
+    document.getElementById('sTotal').textContent = todas.length;
+    document.getElementById('sComp').textContent  = comp.length;
+    document.getElementById('sPend').textContent  = pend.length;
+    document.getElementById('sTasa').textContent  = `${tasa}%`;
+  }
+
+  /**
+   * Renderiza las tarjetas de simulaciones.
+   * @param {Array} sims - Lista de simulaciones.
+   */
+  function renderSims(sims) {
+    const list = document.getElementById('simList');
+    if (!list) return;
+
+    if (sims.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon">🔬</div><p>No se encontraron simulaciones.</p></div>`;
+      return;
+    }
+
+    list.innerHTML = sims.map(s => {
+      const diseno = repoDisenios.findById(s.id_diseno);
+      const efic   = s.metricas.includes('94.5') ? 94 : s.metricas.includes('42') ? 84 : 75;
+      return `
+        <div class="sim-card">
+          <div class="sim-card-header">
+            <div class="sim-type-label">
+              <span>${getTipoIcon(s.tipo)}</span>
+              <div>
+                <h4>Simulación ${capitalizeFirst(s.tipo)}</h4>
+                <div class="text-muted">${diseno ? diseno.nombre : 'Diseño #' + s.id_diseno}</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <span class="badge ${getBadgeClass(s.estado)}">${capitalizeFirst(s.estado)}</span>
+              ${s.cumple ? '<span class="badge badge-success">✓ Cumple specs</span>' : '<span class="badge badge-neutral">— Sin resultado</span>'}
+            </div>
+          </div>
+          <div class="sim-meta">
+            <span>⏱ Duración: ${fmtDuracion(s.duracion)}</span>
+            <span>🔬 Tipo: ${s.tipo}</span>
+          </div>
+          <div class="sim-metrics">💡 ${s.metricas}</div>
+          ${s.estado === 'completada' ? `
+            <div class="progress-section">
+              <div class="progress-label"><span>Nivel de cumplimiento</span><span>${efic}%</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${efic}%;background:${efic>80?'var(--success)':'var(--warning)'}"></div></div>
+            </div>` : `
+            <div class="progress-section">
+              <div class="progress-label"><span>En espera de ejecución</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--warning);animation:pulse 1.5s ease infinite;"></div></div>
+            </div>`
+          }
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            ${s.estado === 'pendiente' ?
+              `<button class="btn btn-primary btn-sm" onclick="ejecutarSimulacion(${s.id})">
+                <span class="material-icons-round" style="font-size:15px;">play_arrow</span> Ejecutar</button>` :
+              `<button class="btn btn-outline btn-sm" onclick="showToast('Ver informe de simulación #${s.id}', 'info')">
+                <span class="material-icons-round" style="font-size:15px;">description</span> Ver Informe</button>`
+            }
+            <button class="btn btn-outline btn-sm" onclick="eliminarSim(${s.id})" style="color:var(--error);">
+              <span class="material-icons-round" style="font-size:15px;">delete</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /**
+   * Simula la ejecución de una simulación pendiente.
+   * @param {number} id - ID de la simulación.
+   */
+  function ejecutarSimulacion(id) {
+    showToast('⏳ Iniciando simulación…', 'info', 1500);
+    setTimeout(() => {
+      repoSimulaciones.update(id, { estado:'completada', cumple:true, duracion:Math.floor(Math.random()*500)+60 });
+      actualizarMetricasSim();
+      renderSims(getFilteredSims());
+      showToast('✅ Simulación completada con éxito.', 'success', 3000);
+    }, 1800);
+  }
+
+  /**
+   * Elimina una simulación.
+   * @param {number} id - ID.
+   */
+  function eliminarSim(id) {
+    if (!confirm('¿Eliminar esta simulación?')) return;
+    repoSimulaciones.remove(id);
+    actualizarMetricasSim();
+    renderSims(getFilteredSims());
+    showToast('Simulación eliminada.', 'warning');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = requireAuth();
+    if (!user) return;
+    renderSidebarUser(user);
+    initCommon();
+    actualizarMetricasSim();
+    renderSims(getFilteredSims());
+
+    // Poblar select diseños en modal
+    const sel = document.getElementById('sDisenio');
+    repoDisenios.getAll().forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.id; opt.textContent = d.nombre; sel.appendChild(opt);
+    });
+
+    document.getElementById('searchSim').addEventListener('input', e => {
+      simSearch = e.target.value.toLowerCase().trim(); renderSims(getFilteredSims());
+    });
+    document.querySelectorAll('.filter-chip[data-tipo]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip[data-tipo]').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active'); tipoFilter = chip.dataset.tipo; renderSims(getFilteredSims());
+      });
+    });
+    document.getElementById('btnNuevaSim').addEventListener('click', () => {
+      document.getElementById('formSim').reset(); openModal('modalSim');
+    });
+    document.getElementById('btnGuardarSim').addEventListener('click', () => {
+      const tipo    = document.getElementById('sTipo').value;
+      const disId   = document.getElementById('sDisenio').value;
+      const metrics = document.getElementById('sMetricas').value.trim();
+      let err = false;
+      if (!validateRequired(tipo))  { setFieldError('sTipo','sTipoErr',true); err=true; } else setFieldError('sTipo','sTipoErr',false);
+      if (!validateRequired(disId)) { setFieldError('sDisenio','sDisenioErr',true); err=true; } else setFieldError('sDisenio','sDisenioErr',false);
+      if (err) return;
+
+      repoSimulaciones.add({ tipo, estado:'pendiente', duracion:null, cumple:false, id_diseno:parseInt(disId), metricas:metrics || 'Pendiente de ejecución' });
+      actualizarMetricasSim();
+      renderSims(getFilteredSims());
+      closeModal('modalSim');
+      showToast(`Simulación ${tipo} programada correctamente ✓`, 'success');
+    });
+  });
+</script>
+</body>
+</html>
